@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Arkayns {
+namespace Arkayns.Reckon.SLA {
 
     public class Helper : MonoBehaviour {
 
-
+        // -- Variables --
         [Range (-1, 1)] public float vertical;
         [Range (-1, 1)] public float horizontal;
         [Space]
@@ -21,9 +21,10 @@ namespace Arkayns {
 
         private Animator anim;
         
+        // -- Built-In Methods --
         private void Start () {
             anim = GetComponent<Animator> ();
-        } // Start
+        } // Start ()
 
         private void Update () {
             enableRM = !anim.GetBool ("canMove");
@@ -38,8 +39,7 @@ namespace Arkayns {
 
             anim.SetBool ("lockon", lockon);
 
-            if (enableRM)
-                return;
+            if (enableRM) return;
 
             if (useItem) {
                 anim.Play ("use_item");
@@ -57,14 +57,13 @@ namespace Arkayns {
                 string targetAnim;
 
                 if (twoHanded) {
-                    int r = Random.Range (0, th_attacks.Length);
+                    var r = Random.Range (0, th_attacks.Length);
                     targetAnim = th_attacks [r];
                 } else {
-                    int r = Random.Range (0, oh_attacks.Length);
+                    var r = Random.Range (0, oh_attacks.Length);
                     targetAnim = oh_attacks [r];
 
-                    if (vertical > 0.5f)
-                        targetAnim = "oh_attack_3";
+                    if (vertical > 0.5f) targetAnim = "oh_attack_3";
                 }
 
                 vertical = 0;
@@ -74,9 +73,8 @@ namespace Arkayns {
 
             anim.SetFloat ("vertical", vertical);
             anim.SetFloat ("horizontal", horizontal);
-
-        } // Update
+        } // Update ()
 
     } // Class Helper
 
-} // Namespace Arkayns
+} // Namespace Arkayns Reckon SLA

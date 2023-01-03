@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-namespace Arkayns {
+namespace Arkayns.Reckon.SLA {
 
     public class StateManager : MonoBehaviour {
         
+        // -- Variables --
         [Header ("Init")]
         public GameObject activeModel;
 
@@ -24,16 +25,13 @@ namespace Arkayns {
         public bool run;
         public bool lockOn;
 
-        [HideInInspector]
-        public Animator anim;
-        [HideInInspector]
-        public Rigidbody rigid;
+        [HideInInspector] public Animator anim; 
+        [HideInInspector] public Rigidbody rigid;
 
-        [HideInInspector]
-        public float delta;
-        [HideInInspector]
-        public LayerMask ignoreLayers;
+        [HideInInspector] public float delta;
+        [HideInInspector] public LayerMask ignoreLayers;
 
+        // -- Methods --
         public void Init () {
             SetupAnimator ();
             rigid = GetComponent<Rigidbody> ();
@@ -43,83 +41,68 @@ namespace Arkayns {
 
             gameObject.layer = 8;
             ignoreLayers = ~(1 << 9);
-
-            
-        } // Init
+        } // Init ()
 
         private void SetupAnimator () {
             if (activeModel == null) {
                 anim = GetComponentInChildren<Animator> ();
                 activeModel = anim.gameObject;
+                if (anim == null) Debug.Log ("No model found");
+            } else activeModel = anim.gameObject;
 
-                if (anim == null)
-                    Debug.Log ("No model found");
-            } else {
-                activeModel = anim.gameObject;
-            }
-
-            if (anim == null)
-                anim = activeModel.GetComponent<Animator> ();
-        } // SetupAnimator
+            if (anim == null) anim = activeModel.GetComponent<Animator> ();
+        } // SetupAnimator ()
 
         public void FixedTick (float d) {
             delta = d;
 
             rigid.drag = (moveAmount > 0 || onGround == false) ? 0 : 4;
 
-            float targetSpee = moveSpeed;
-            if (run)
-                targetSpee = runSpeed;
-
-            if (onGround)
-                rigid.velocity = moveDir * (targetSpee * moveAmount);
-
-            if (run)
-                lockOn = false;
+            var targetSpeed = moveSpeed;
+            if (run) targetSpeed = runSpeed;
+            if (onGround) rigid.velocity = moveDir * (targetSpeed * moveAmount);
+            if (run) lockOn = false;
 
             if (!lockOn) {
-                Vector3 targetDir = moveDir;
+                var targetDir = moveDir;
                 targetDir.y = 0;
-                if (targetDir == Vector3.zero)
-                    targetDir = transform.forward;
-                Quaternion targetRot = Quaternion.LookRotation (targetDir);
-                Quaternion targetRotation = Quaternion.Slerp (transform.rotation, targetRot, delta * moveAmount * rotateSpeed);
+                if (targetDir == Vector3.zero) targetDir = transform.forward;
+                var targetRot = Quaternion.LookRotation (targetDir);
+                var targetRotation = Quaternion.Slerp (transform.rotation, targetRot, delta * moveAmount * rotateSpeed);
                 transform.rotation = targetRotation;
             }
 
             HandleMovementAnimations ();
-        } // FixedTick
+        } // FixedTick ()
 
         public void Tick (float d) {
             delta = d;
             onGround = OnGround ();
-
             anim.SetBool ("onGround", onGround);
-        } // Tick
+        } // Tick ()
 
         private void HandleMovementAnimations () {
             anim.SetBool ("run", run);
             anim.SetFloat ("vertical", moveAmount, 0.4f, delta);
-        } // HandleMovementAnimations
+        } // HandleMovementAnimations ()
 
         public bool OnGround () {
-            bool r = false;
+            var r = false;
 
-            Vector3 origin = transform.position + (Vector3.up * toGround);
-            Vector3 dir = -Vector3.up;
-            float dis = toGround + 0.3f;
-            RaycastHit hit;
+            var origin = transform.position + (Vector3.up * toGround);
+            var dir = -Vector3.up;
+            var dis = toGround + 0.3f;
 
             Debug.DrawRay (origin, dir * dis);
-            if (Physics.Raycast(origin, dir, out hit, dis, ignoreLayers)) {
+            if (Physics.Raycast(origin, dir, out var hit, dis, ignoreLayers)) {
                 r = true;
-                Vector3 targetPosition = hit.point;
+                var targetPosition = hit.point;
                 transform.position = targetPosition;
             }
 
             return r;
-        } // OnGround
+        } // OnGround ()
 
     } // Class StateManager
 
-} // Namespace Arkayns
+} // Namespace Arkayns Reckon SLA
